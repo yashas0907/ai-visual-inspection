@@ -1,5 +1,7 @@
 # AI Visual Inspection & Defect Detection Platform
 
+![CI](https://github.com/yashas0907/ai-visual-inspection/actions/workflows/ci.yml/badge.svg)
+
 An end-to-end industrial quality-inspection platform for **hot-rolled steel
 strip surface defects**. Upload a surface image → the system classifies the
 defect type (6 NEU defect classes), explains *where* the model looked
