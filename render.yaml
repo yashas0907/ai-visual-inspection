@@ -1,0 +1,13 @@
+# Render.com blueprint — deploys the free-tier ONNX image from the GitHub repo.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: surfacespec
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile.cloud
+    plan: free            # 512MB RAM, spins down after ~15 min idle (wakes on visit)
+    healthCheckPath: /api/health
+    autoDeploy: true      # redeploy on every push to main
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"

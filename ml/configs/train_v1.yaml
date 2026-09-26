@@ -1,0 +1,33 @@
+# Dataset: NEU Surface Defects Database (classification split)
+dataset_name: neu-surface-defects
+source_url: https://huggingface.co/datasets/Vania43/neu_det_caption/resolve/main/data/train-00000-of-00001.parquet
+classes:
+  - crazing
+  - inclusion
+  - patches
+  - pitted_surface
+  - rolled-in_scale
+  - scratches
+image_size: 224
+grayscale: true
+val_split: 0.15   # 10% test + 15% val + 75% train of the 1440 images
+test_split: 0.10
+seed: 42
+
+train:
+  model_arch: resnet18
+  pretrained: true
+  batch_size: 32
+  epochs: 30
+  lr: 0.0003
+  weight_decay: 0.0001
+  scheduler: cosine
+  warmup_epochs: 2
+  early_stopping_patience: 8
+  early_stopping_metric: val_f1_macro
+  num_workers: 0
+  amp: false
+
+eval:
+  batch_size: 64
+  confusion_out_prefix: confusion_matrix

@@ -1,0 +1,29 @@
+{
+  "experiment": "v1_resnet18",
+  "source_checkpoint": "C:\\Users\\phata\\OneDrive\\Documents\\Default Project\\ai-visual-inspection\\models\\experiments\\v1_resnet18\\best.pth",
+  "best_epoch": 12,
+  "classes": [
+    "crazing",
+    "inclusion",
+    "patches",
+    "pitted_surface",
+    "rolled-in_scale",
+    "scratches"
+  ],
+  "image_size": 224,
+  "channels": 1,
+  "normalization": {
+    "mean": [
+      0.5088
+    ],
+    "std": [
+      0.2095
+    ]
+  },
+  "outputs": [
+    "logits",
+    "layer4_feats"
+  ],
+  "onnx_bytes": 44683795,
+  "note": "heatmap = relu(fc_weights[class] @ layer4_feats) == torch Grad-CAM for this architecture (avgpool+fc path is linear); see docs/explainability.md"
+}

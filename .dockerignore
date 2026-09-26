@@ -1,0 +1,47 @@
+# Keep Docker build contexts lean: no datasets, venvs, node_modules or artifacts
+.git
+.github
+.venv
+venv
+node_modules
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+
+# Datasets never enter images. Model artifacts allowlist:
+# - compose backend image: mounts artifacts (nothing baked)
+# - deploy/ cloud image: needs the exported ONNX graph + metrics JSONs
+data
+models/*
+models/experiments/*
+models/experiments/v1_resnet18/*
+!models/experiments/v1_resnet18/best.pth
+!models/experiments/v1_resnet18/metadata.json
+!models/experiments/v1_resnet18/history.json
+!models/experiments/v1_resnet18/test_metrics.json
+!models/experiments/v1_resnet18/confusion_matrix.png
+!models/onnx/resnet18_neu.onnx
+!models/onnx/fc_weights.npz
+!models/onnx/export_meta.json
+
+# Runtime state & logs
+backend/inspection.db
+backend/storage
+*.log
+logs
+
+# Frontend build inputs (not needed by the backend image; the frontend image
+# rebuilds from source and only needs package files + src, not node_modules/dist)
+frontend/node_modules
+frontend/dist
+frontend/npm_install.log
+frontend/tsconfig.tsbuildinfo
+frontend/.env*
+
+# Env & docs stay out of images
+.env
+*.env.local
+docs
+README.md
+
+!deploy

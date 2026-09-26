@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: inspection-backend
+    environment:
+      VI_ENVIRONMENT: production
+      VI_DATABASE_URL: sqlite:////app/backend/data/inspection.db
+      VI_UPLOAD_DIR: /app/backend/storage/uploads
+      VI_CORS_ORIGINS: "http://localhost:8090,http://127.0.0.1:8090"
+      VI_MODEL_CHECKPOINT: /app/models/experiments/v1_resnet18/best.pth
+      VI_MODEL_VERSION: "v1.0.0"
+      VI_MODEL_EXPERIMENT: v1_resnet18
+    volumes:
+      # Mount trained artifacts (run scripts/train.sh first)
+      - ./models:/app/models:ro
+      # Persist only DB + uploads across container rebuilds (never app code)
+      - backend-db:/app/backend/data
+      - backend-uploads:/app/backend/storage
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/api/health', timeout=5)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: backend/frontend.Dockerfile
+    container_name: inspection-frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8090:80"
+
+volumes:
+  backend-db:
+  backend-uploads:

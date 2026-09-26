@@ -1,0 +1,20 @@
+# Core
+python-dotenv==1.0.1
+pydantic==2.9.2
+pydantic-settings==2.6.1
+
+# Backend
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.17
+sqlalchemy==2.0.36
+alembic==1.14.0
+
+# ML runtime
+# NOTE: torch/torchvision are intentionally NOT pinned here. The Dockerfile
+# installs the CPU wheels explicitly; for local installs run:
+#   pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
+# (or the CUDA wheel of the same versions for GPU training)
+numpy==1.26.4
+pillow==11.0.0
+opencv-python-headless==4.10.0.84

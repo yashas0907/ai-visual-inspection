@@ -1,0 +1,66 @@
+# Cloud deployment image — TORCH-FREE ONNX serving (free-tier friendly).
+#
+# Why no torch: the CPU torch runtime alone needs ~450MB RSS, overflowing
+# free hosting RAM limits (512MB on Render free). The ONNX backend serves
+# identical predictions + explainability (verified: argmax 25/25, softmax
+# delta 0.0, CAM correlation 1.0 — see ml/export_onnx.py) at ~153MB RSS.
+#
+# Build context: repo root (requires models/onnx/resnet18_neu.onnx,
+# produced by `python ml/export_onnx.py` and committed to the repo).
+
+# ---- stage 1: frontend build ----------------------------------------------
+FROM node:20-alpine AS frontend-build
+WORKDIR /web
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+# ---- stage 2: torch-free python serving image ------------------------------
+FROM python:3.12-slim
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app:/app/backend
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    onnxruntime==1.20.1 \
+    numpy==1.26.4 \
+    pillow==11.0.0 \
+    fastapi==0.115.5 \
+    uvicorn[standard]==0.32.1 \
+    python-multipart==0.0.17 \
+    sqlalchemy==2.0.36 \
+    alembic==1.14.0 \
+    pydantic==2.9.2 \
+    pydantic-settings==2.6.1 \
+    python-dotenv==1.0.1
+
+# Application code (torch-free import graph in onnx mode)
+COPY ml/ ml/
+COPY backend/app/ backend/app/
+COPY backend/alembic.ini backend/alembic.ini
+COPY backend/alembic/ backend/alembic/
+
+# Model artifacts: exported ONNX graph (+fc weights) and the small genuine
+# metrics JSONs so the model card works in the deployed app.
+COPY models/onnx/ models/onnx/
+COPY models/experiments/v1_resnet18/test_metrics.json models/experiments/v1_resnet18/test_metrics.json
+COPY models/experiments/v1_resnet18/metadata.json models/experiments/v1_resnet18/metadata.json
+COPY models/experiments/v1_resnet18/history.json models/experiments/v1_resnet18/history.json
+
+COPY --from=frontend-build /web/dist /app/frontend_dist
+
+ENV VI_INFERENCE_BACKEND=onnx \
+    VI_MODEL_CHECKPOINT=/app/models/onnx/resnet18_neu.onnx \
+    VI_MODEL_VERSION=v1.0.0 \
+    VI_MODEL_EXPERIMENT=v1_resnet18 \
+    VI_FRONTEND_DIST=/app/frontend_dist \
+    VI_DATABASE_URL=sqlite:////app/data/inspection.db \
+    VI_UPLOAD_DIR=/app/data/storage/uploads \
+    VI_CORS_ORIGINS="*"
+
+RUN mkdir -p /app/data/storage/uploads /app/data/storage/results
+
+# Render sets $PORT (default 10000); other hosts can map any port.
+CMD ["sh", "-c", "uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port ${PORT:-10000}"]

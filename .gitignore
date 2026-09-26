@@ -1,0 +1,49 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Env / secrets ----
+.env
+*.env.local
+
+# ---- Datasets & data artifacts (reproducible via scripts) ----
+data/raw/
+data/processed/
+data/_tmp_extract/
+
+# ---- Model artifacts (large binaries; regenerate by training) ----
+models/experiments/
+*.pth
+
+# ---- Backend runtime state ----
+backend/inspection.db
+backend/inspection.db-journal
+backend/storage/
+backend/*.log
+
+# ---- Frontend ----
+frontend/node_modules/
+frontend/dist/
+frontend/npm_install.log
+
+# ---- Logs / scratch ----
+*.log
+train_*.log
+pip_*.log
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+backend/.pytest_cache/
+*.tsbuildinfo
+
+deploy/_scratch/
+
+.tools/
+share_demo_*.log
