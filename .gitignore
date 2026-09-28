@@ -18,7 +18,15 @@ data/processed/
 data/_tmp_extract/
 
 # ---- Model artifacts (large binaries; regenerate by training) ----
-models/experiments/
+# Checkpoints stay out; the small genuine metrics JSONs stay in — the cloud
+# image (deploy/Dockerfile.cloud) serves the model card from them.
+models/experiments/*
+!models/experiments/v1_resnet18/
+models/experiments/v1_resnet18/*
+!models/experiments/v1_resnet18/test_metrics.json
+!models/experiments/v1_resnet18/metadata.json
+!models/experiments/v1_resnet18/history.json
+!models/experiments/v1_resnet18/confusion_matrix.png
 *.pth
 
 # ---- Backend runtime state ----

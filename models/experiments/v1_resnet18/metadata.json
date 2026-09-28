@@ -1,0 +1,52 @@
+{
+  "experiment": "v1_resnet18",
+  "config": {
+    "data": {
+      "dataset_name": "neu-surface-defects",
+      "source_url": "https://huggingface.co/datasets/Vania43/neu_det_caption/resolve/main/data/train-00000-of-00001.parquet",
+      "classes": [
+        "crazing",
+        "inclusion",
+        "patches",
+        "pitted_surface",
+        "rolled-in_scale",
+        "scratches"
+      ],
+      "image_size": 224,
+      "val_split": 0.15,
+      "test_split": 0.1,
+      "seed": 42,
+      "grayscale": true
+    },
+    "train": {
+      "model_arch": "resnet18",
+      "pretrained": true,
+      "batch_size": 32,
+      "epochs": 30,
+      "lr": 0.0003,
+      "weight_decay": 0.0001,
+      "scheduler": "cosine",
+      "warmup_epochs": 2,
+      "early_stopping_patience": 8,
+      "early_stopping_metric": "val_f1_macro",
+      "num_workers": 0,
+      "amp": false
+    },
+    "eval": {
+      "batch_size": 64,
+      "confusion_out_prefix": "confusion_matrix"
+    }
+  },
+  "environment": {
+    "python": "3.12.10",
+    "torch": "2.5.1+cpu",
+    "cuda_available": false,
+    "device": "cpu",
+    "platform": "win32"
+  },
+  "train_seconds": 2907.6,
+  "epochs_run": 20,
+  "best_epoch": 12,
+  "best_val_f1_macro": 1.0,
+  "model_size_mb_fp32": 42.62
+}
