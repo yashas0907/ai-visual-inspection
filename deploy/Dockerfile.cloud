@@ -23,6 +23,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app:/app/backend
 WORKDIR /app
 
+# Runtime shared libraries required by the onnxruntime C++ binary.
+# slim images do NOT ship libstdc++6/libgomp1 — without them the container
+# builds fine but crashes on `import onnxruntime` (health check never passes,
+# deploy fails ~2 min in). Classic onnxruntime-on-slim pitfall.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libstdc++6 libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --no-cache-dir \
     onnxruntime==1.20.1 \
     numpy==1.26.4 \
@@ -35,6 +43,10 @@ RUN pip install --no-cache-dir \
     pydantic==2.9.2 \
     pydantic-settings==2.6.1 \
     python-dotenv==1.0.1
+
+# Fail the BUILD (with a clear error) if runtime shared libs are broken,
+# instead of failing the deploy later with an opaque health-check timeout.
+RUN python -c "import onnxruntime, numpy, PIL; print('runtime deps ok')"
 
 # Application code (torch-free import graph in onnx mode)
 COPY ml/ ml/
