@@ -2,6 +2,11 @@
 
 ![CI](https://github.com/yashas0907/ai-visual-inspection/actions/workflows/ci.yml/badge.svg)
 
+**Live demo:** https://surfacespec.onrender.com — full platform on free-tier
+hosting via a torch-free ONNX serving backend (~159MB RSS; predictions and
+Grad-CAM heatmaps verified identical to the torch backend). First request
+after ~15 min idle takes ~30–60s while the free instance wakes.
+
 An end-to-end industrial quality-inspection platform for **hot-rolled steel
 strip surface defects**. Upload a surface image → the system classifies the
 defect type (6 NEU defect classes), explains *where* the model looked

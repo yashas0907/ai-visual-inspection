@@ -92,8 +92,14 @@ def create_app() -> FastAPI:
         async def spa(spa_path: str):
             # API routes are matched first (registered above), so anything
             # reaching here that isn't a known file falls back to index.html.
-            candidate = (frontend_dist / spa_path).resolve()
-            if spa_path and candidate.is_file() and str(candidate).startswith(str(frontend_dist.resolve())):
+            # OSError guard: Linux raises ENAMETOOLONG on absurd path
+            # components (Windows doesn't) — treat as a normal SPA fallback.
+            try:
+                candidate = (frontend_dist / spa_path).resolve()
+                inside = str(candidate).startswith(str(frontend_dist.resolve()))
+            except OSError:
+                candidate, inside = None, False
+            if spa_path and candidate is not None and inside and candidate.is_file():
                 return FileResponse(candidate)
             return FileResponse(frontend_dist / "index.html")
 

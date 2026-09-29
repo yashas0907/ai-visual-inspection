@@ -35,11 +35,13 @@ def serve_image(relative_path: str) -> FileResponse:
     storage_root = Path(get_settings().upload_dir).parent.resolve()
     # Normalize and reject traversal attempts explicitly. is_relative_to is
     # a strict path-containment check (no sibling-prefix bypass, e.g.
-    # /storage-x when the root is /storage).
-    candidate = (storage_root / relative_path).resolve()
+    # /storage-x when the root is /storage). NOTE: resolve() raises OSError
+    # on Linux for path components >255 bytes (ENAMETOOLONG) — Windows
+    # tolerates them — so long-path errors are treated as 404, not 500.
     try:
+        candidate = (storage_root / relative_path).resolve()
         candidate.relative_to(storage_root)
-    except ValueError:
+    except (OSError, ValueError):
         raise NotFoundError("path traversal rejected") from None
     if not candidate.is_file():
         raise NotFoundError("image not found")

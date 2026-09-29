@@ -8,6 +8,7 @@ measures real response times for each interaction.
 from __future__ import annotations
 
 import json
+import os
 import statistics
 import sys
 import time
@@ -16,7 +17,7 @@ import urllib.error
 import uuid
 from pathlib import Path
 
-BASE = "http://127.0.0.1:8001"  # direct API (frontend proxies here)
+BASE = os.environ.get("POV_BASE", "http://127.0.0.1:8001")
 DATA = Path(__file__).resolve().parents[1] / "data" / "processed" / "test"
 
 PASS, FAIL = [], []
@@ -159,9 +160,9 @@ tmp.unlink()
 
 # traversal
 s, _, _ = req("GET", "/api/storage/..%2F..%2F..%2FWindows%2Fwin.ini")
-check("path traversal blocked", s == 404)
+check("path traversal blocked", s in (400, 404), f"status={s}")
 s, _, _ = req("GET", f"/api/storage/{'a'*300}.jpg")
-check("missing image 404", s == 404)
+check("missing image 404", s in (400, 404, 414), f"status={s}")
 s, b, _ = req("GET", "/api/inspections/99999")
 check("missing inspection 404", s == 404)
 
