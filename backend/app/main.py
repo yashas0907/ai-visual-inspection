@@ -99,8 +99,12 @@ def create_app() -> FastAPI:
                 inside = str(candidate).startswith(str(frontend_dist.resolve()))
             except OSError:
                 candidate, inside = None, False
-            if spa_path and candidate is not None and inside and candidate.is_file():
-                return FileResponse(candidate)
+            if spa_path and candidate is not None and inside:
+                try:
+                    if candidate.is_file():  # propagates ENAMETOOLONG on Linux
+                        return FileResponse(candidate)
+                except OSError:
+                    pass
             return FileResponse(frontend_dist / "index.html")
 
     # ----- exception handling ----------------------------------------------
@@ -131,7 +135,10 @@ def create_app() -> FastAPI:
         logger.exception("unhandled error on %s", request.url.path)
         return JSONResponse(
             status_code=500,
-            content={"error": "InternalServerError", "detail": "an unexpected error occurred"},
+            content={
+                "error": "InternalServerError",
+                "detail": f"an unexpected error occurred ({type(exc).__name__})",
+            },
         )
 
     return app

@@ -43,7 +43,14 @@ def serve_image(relative_path: str) -> FileResponse:
         candidate.relative_to(storage_root)
     except (OSError, ValueError):
         raise NotFoundError("path traversal rejected") from None
-    if not candidate.is_file():
+    # NOTE: Path.is_file() PROPAGATES non-ENOSENT OSErrors — on Linux a path
+    # component >255 bytes raises ENAMETOOLONG (Windows tolerates it), which
+    # previously surfaced as a 500. Treat any stat failure as "not found".
+    try:
+        is_file = candidate.is_file()
+    except OSError:
+        is_file = False
+    if not is_file:
         raise NotFoundError("image not found")
     ext = candidate.suffix.lower()
     if ext not in MIME:

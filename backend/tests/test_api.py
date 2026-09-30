@@ -260,6 +260,23 @@ class TestStorageSecurity:
     def test_rejects_missing(self, client: TestClient):
         assert client.get("/api/storage/uploads/nope.jpg").status_code == 404
 
+    def test_long_path_404_when_stat_fails(self, client: TestClient, monkeypatch):
+        """Regression (Linux): components >255 bytes raise ENAMETOOLONG from
+        Path.is_file() — Windows tolerates them, so simulate the syscall
+        failure and require a clean 404 (previously a 500 in production)."""
+        import pathlib
+
+        def raise_enametoolong(self):
+            raise OSError(36, "File name too long")  # ENAMETOOLONG
+
+        monkeypatch.setattr(pathlib.Path, "is_file", raise_enametoolong)
+        r = client.get(f"/api/storage/{'a' * 300}.jpg")
+        assert r.status_code == 404
+
+    def test_long_path_404_when_stat_ok(self, client: TestClient):
+        # On Windows stat succeeds for long names — still a clean 404.
+        assert client.get(f"/api/storage/{'a' * 300}.jpg").status_code == 404
+
 
 class TestModelInfo:
     def test_model_info(self, client: TestClient):
