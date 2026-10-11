@@ -1,5 +1,11 @@
 # Go-Live Guide (Beginner Friendly)
 
+> **STATUS: COMPLETE** ✅ — the platform is deployed and verified:
+> - Live app: https://surfacespec.onrender.com (43/43 production checks passed)
+> - Repo: https://github.com/yashas0907/ai-visual-inspection (CI green)
+> This guide remains as the reference for how it was done, and how to redo
+> any step (e.g., if you ever recreate the Render service).
+
 Two steps, in this order:
 
 1. **PART 1 — GitHub** (the portfolio repo; everything else deploys from it)
@@ -103,14 +109,16 @@ Render gives you: **https://surfacespec.onrender.com** — always on:
 
 ---
 
-# Bonus: instant demo tunnel from your laptop
+# Bonus: instant demo tunnel from your laptop (optional, not needed anymore)
 
-For a live demo RIGHT NOW without any account (URL is temporary, laptop must
-stay on):
+For a live demo without any account (URL is temporary, laptop must stay on):
 
 ```powershell
 .\scripts\share_demo.ps1
 ```
+
+The always-on Render deployment above supersedes this — keep it only for
+emergency demos (e.g., if Render is down).
 
 ---
 
