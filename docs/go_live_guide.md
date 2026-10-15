@@ -64,7 +64,7 @@ intentional: Render needs it to serve your model without retraining.
 1. Refresh the repo page → all folders visible (`backend/`, `ml/`,
    `frontend/`, `docs/`, `deploy/`, ...)
 2. Click the **Actions** tab → a workflow called **CI** starts → wait for a
-   green ✅ (runs 78 tests + frontend build, ~5-10 min).
+   green ✅ (runs 80 tests + frontend build, ~5-10 min).
    Green CI on a portfolio repo = instant credibility.
 3. Settings → verify no `.env` file appears in the repo (it shouldn't).
 

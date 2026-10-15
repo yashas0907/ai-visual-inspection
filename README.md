@@ -260,9 +260,9 @@ docker compose up --build            # frontend :8090, backend :8000
 ## 19. Testing
 
 ```bash
-# 78 tests: validation, severity rules, confidence tiers, DB constraints,
+# 80 tests: validation, severity rules, confidence tiers, DB constraints,
 # API integration (upload/feedback/analytics/security), ML pipeline,
-# Grad-CAM sanity, SPA mode, ONNX backend parity (vs torch)
+# Grad-CAM sanity, SPA mode, ONNX backend parity, Linux long-path regression
 cd backend
 PYTHONPATH=..;..\\backend python -m pytest tests -q     # PowerShell syntax shown in scripts
 ```
